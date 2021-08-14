@@ -1,13 +1,14 @@
 import React from 'react';
 import './App.css';
 import Cars from './Cars';
-import MyContext from './MyContext';
+import Provider from '../src/context/Provider';
+
 
 function App() {
   return (
-    <MyContext.Provider value={contextValue}>
+    <Provider>
       <Cars />
-    </MyContext.Provider>
+    </Provider>
   );
 }
 

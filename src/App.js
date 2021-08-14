@@ -2,12 +2,15 @@ import React from 'react';
 import TrafficSignal from './TrafficSignal';
 import './App.css';
 import Cars from './Cars';
+import Provider from '../src/context/Provider';
 
 function App() {
   return (
     <div className="container">
-      <Cars />
-      <TrafficSignal />
+      <Provider>
+        <Cars />
+        <TrafficSignal />
+      </Provider>
     </div>
   );
 }

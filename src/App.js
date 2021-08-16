@@ -1,49 +1,50 @@
 // src/App.js
 
 import React, { Component } from 'react';
-import PropTypes from 'prop-types';
-import { connect } from 'react-redux';
-
-import { selectSubreddit, fetchPostsIfNeeded, refreshSubreddit } from './actions';
 import Posts from './components/Posts';
 import Selector from './components/Selector';
+import MyContext from './context/context';
 
 class App extends Component {
   componentDidMount() {
-    const { dispatch, selectedSubreddit } = this.props;
-    dispatch(fetchPostsIfNeeded(selectedSubreddit));
+    const { getPosts, selectedSubreddit } = this.context;
+    getPosts(selectedSubreddit);
   }
 
-  componentDidUpdate(prevProps) {
-    const { props } = this;
+  // componentDidUpdate(prevProps) {
+  //   const { props } = this;
 
-    if (prevProps.selectedSubreddit !== props.selectedSubreddit) {
-      const { dispatch, selectedSubreddit } = props;
-      dispatch(fetchPostsIfNeeded(selectedSubreddit));
-    }
-  }
+  //   if (prevProps.selectedSubreddit !== props.selectedSubreddit) {
+  //     const { getPosts, selectedSubreddit } = props;
+  //     getPosts(selectedSubreddit);
+  //   }
+  // } // não entendi por que não usa mais essa função!!!
 
   selectSubreddit(nextSubreddit) {
-    const { dispatch } = this.props;
-    dispatch(selectSubreddit(nextSubreddit));
+    // const { dispatch } = this.props;
+    // dispatch(selectSubreddit(nextSubreddit)); // a action recebia o próximo subreddit, mas agora é a função que faz o fetch.
+    const { getPosts } = this.context;
+    getPosts(nextSubreddit);
   }
 
   handleRefreshClick(event) {
     event.preventDefault();
 
-    const { dispatch, selectedSubreddit } = this.props;
-    dispatch(refreshSubreddit(selectedSubreddit));
-    dispatch(fetchPostsIfNeeded(selectedSubreddit));
+    // const { dispatch, selectedSubreddit } = this.props;
+    // dispatch(refreshSubreddit(selectedSubreddit));
+    // dispatch(fetchPostsIfNeeded(selectedSubreddit));
+    const { getPosts, selectedSubreddit } = this.context;
+    getPosts(selectedSubreddit);
   }
 
   renderLastUpdatedAt() {
-    const { lastUpdated } = this.props;
+    const { lastUpdated } = this.context; // lastUpdated vinha de this.props.
 
     return <span>{`Last updated at ${new Date(lastUpdated).toLocaleTimeString()}.`}</span>;
   }
 
   renderRefreshButton() {
-    const { isFetching } = this.props;
+    const { isFetching } = this.context; // antes vinha de this.props
 
     return (
       <button
@@ -60,10 +61,10 @@ class App extends Component {
     const {
       availableSubreddits,
       selectedSubreddit,
-      posts = [],
+      posts,
       isFetching,
       lastUpdated,
-    } = this.props;
+    } = this.context;
 
     const isEmpty = posts.length === 0;
 
@@ -86,36 +87,6 @@ class App extends Component {
   }
 }
 
-const mapStateToProps = (state) => {
-  const { selectedSubreddit, postsBySubreddit } = state;
-  const { isFetching, lastUpdated, items: posts } = postsBySubreddit[selectedSubreddit];
+App.contextType = MyContext;
 
-  return {
-    selectedSubreddit,
-    posts,
-    isFetching,
-    lastUpdated,
-    availableSubreddits: Object.keys(postsBySubreddit),
-  };
-};
-
-App.propTypes = {
-  availableSubreddits: PropTypes.arrayOf(PropTypes.string.isRequired).isRequired,
-  dispatch: PropTypes.func.isRequired,
-  isFetching: PropTypes.bool.isRequired,
-  lastUpdated: PropTypes.number,
-  posts: PropTypes.arrayOf(
-    PropTypes.shape({
-      id: PropTypes.string.isRequired,
-      title: PropTypes.string.isRequired,
-    }),
-  ),
-  selectedSubreddit: PropTypes.string.isRequired,
-};
-
-App.defaultProps = {
-  lastUpdated: null,
-  posts: [],
-};
-
-export default connect(mapStateToProps)(App);
+export default App;

@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 
 const Posts = ({ posts }) => (
   <ul>
-    {posts.map(({ id, title }) => <li key={id}>{title}</li>)}
+    {posts.map(({ data: { id, title } }) => <li key={id}>{title}</li>)}
   </ul>
 );
 
